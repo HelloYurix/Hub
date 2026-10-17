@@ -14,7 +14,7 @@ local Service = {
 	Players = GetService("Players"),
 	CoreGui = GetService("CoreGui")
 }
-lcoal CoreGui = Service.CoreGui
+local CoreGui = Service.CoreGui
 local TweenService = Service.TweenService
 local RunService =	Service.RunService
 local HttpService = Service.HttpService
