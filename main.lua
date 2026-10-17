@@ -5,14 +5,14 @@ local MacLib = {
 
 
 local Service = {
-	TweenService = game.GetService("TweenService"),
-	RunService = game.GetService("RunService"),
-	HttpService = game.GetService("HttpService"),
-	ContentProvider = game.GetService("ContentProvider"),
-	UserInputService = game.GetService("UserInputService"),
-	Lighting = game.GetService("Lighting"),
-	Players = game.GetService("Players"),
-	CoreGui = game.GetService("CoreGui")
+	TweenService = game:GetService("TweenService"),
+	RunService = game:GetService("RunService"),
+	HttpService = game:GetService("HttpService"),
+	ContentProvider = game:GetService("ContentProvider"),
+	UserInputService = game:GetService("UserInputService"),
+	Lighting = game:GetService("Lighting"),
+	Players = game:GetService("Players"),
+	CoreGui = game:GetService("CoreGui")
 }
 local CoreGui = Service.CoreGui
 local TweenService = Service.TweenService
