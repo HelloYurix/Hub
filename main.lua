@@ -872,13 +872,10 @@ function MacLib:Window(Settings)
 	topbar.Parent = content
 
 	content.Parent = base
+	base.Parent = macLib
 
 	
-	UserInputService.InputEnded:Connect(function(inp)
-		if inp.UserInputType == Enum.UserInputType.MouseButton1 and toggled and not hovering then
-			toggle()
-		end
-	end)
+
 
 	local BlurTarget = base
 
