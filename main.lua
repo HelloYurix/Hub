@@ -60,7 +60,7 @@ if isStudio then
 end
 
 local function GetGui()
-		local parent = CoreGui("CoreGui")
+		local parent =	CoreGui
 
 	for _, gui in ipairs(parent:GetChildren()) do
 		if gui.Name == "Senith V1.0" then 
