@@ -45,28 +45,32 @@ local assets = {
 	sliderhead = "rbxassetid://18772834246",
 }
 
---// ==================================================================
---//  HELPER FUNCTIONS
---// ==================================================================
+
 
 local function GetGui()
+	local parent = RunService:IsStudio()
+		and LocalPlayer:FindFirstChild("PlayerGui")
+		or (gethui and gethui())
+		or (cloneref and cloneref(MacLib.GetService("CoreGui")) or MacLib.Core.GetService("CoreGui"))
+
+	if parent then
+		for _, gui in ipairs(parent:GetChildren()) do
+			if gui:IsA("ScreenGui") and gui.Name == "Senith V1.0 " then
+				gui:Destroy()
+				print("uh")
+			end
+		end
+	end
+
 	local newGui = Instance.new("ScreenGui")
+	newGui.Name = "Senith V1.0 "
 	newGui.ScreenInsets = Enum.ScreenInsets.None
 	newGui.ResetOnSpawn = false
 	newGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 	newGui.DisplayOrder = 2147483647
 
-	local parent = RunService:IsStudio()
-		and LocalPlayer:FindFirstChild("PlayerGui")
-		or (gethui and gethui())
-		or (cloneref and cloneref(MacLib.GetService("CoreGui")) or MacLib.GetService("CoreGui"))
-
 	newGui.Parent = parent
 	return newGui
-end
-
-local function Tween(instance, tweeninfo, propertytable)
-	return TweenService:Create(instance, tweeninfo, propertytable)
 end
 
 
