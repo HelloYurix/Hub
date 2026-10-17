@@ -45,9 +45,12 @@ local assets = {
 	sliderhead = "rbxassetid://18772834246",
 }
 
-
+--// ==================================================================
+--//  HELPER FUNCTIONS
+--// ==================================================================
 
 local function GetGui()
+	-- ตรวจสอบและลบ ScreenGui ตัวเก่าที่ชื่อ "Senith V1.0 " ออกก่อน (รองรับทั้ง PlayerGui และ CoreGui/gethui)
 	local parent = RunService:IsStudio()
 		and LocalPlayer:FindFirstChild("PlayerGui")
 		or (gethui and gethui())
@@ -57,7 +60,7 @@ local function GetGui()
 		for _, gui in ipairs(parent:GetChildren()) do
 			if gui:IsA("ScreenGui") and gui.Name == "Senith V1.0 " then
 				gui:Destroy()
-				print("uh")
+				print("[MacLib] พบ UI เก่า 'Senith V1.0 ' ทำการลบออกเรียบร้อยแล้ว และกำลังสร้างใหม่...")
 			end
 		end
 	end
@@ -74,6 +77,10 @@ local function GetGui()
 end
 
 
+ local tw = Tween(toggle1, TweenSettings.Info, { ImageTransparency = transparencyValues[1] })
+if tw then
+    tw:Play()
+end
 --// ==================================================================
 --//  WINDOW
 --// ==================================================================
