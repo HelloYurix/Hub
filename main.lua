@@ -77,10 +77,11 @@ local function GetGui()
 end
 
 
- local tw = Tween(toggle1, TweenSettings.Info, { ImageTransparency = transparencyValues[1] })
-if tw then
-    tw:Play()
+local function Tween(instance, tweeninfo, propertytable)
+	return TweenService:Create(instance, tweeninfo, propertytable)
 end
+
+
 --// ==================================================================
 --//  WINDOW
 --// ==================================================================
