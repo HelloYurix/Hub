@@ -1,22 +1,33 @@
-
-local MacLib = {
-	Options = {},
-	Folder = "Maclib",
+local MacLib = { 
+	Options = {}, 
+	Folder = "Maclib", 
 	GetService = function(service)
 		return cloneref and cloneref(game:GetService(service)) or game:GetService(service)
 	end
 }
 
-local TweenService = MacLib.GetService("TweenService")
-local RunService = MacLib.GetService("RunService")
-local HttpService = MacLib.GetService("HttpService")
-local ContentProvider = MacLib.GetService("ContentProvider")
-local UserInputService = MacLib.GetService("UserInputService")
-local Lighting = MacLib.GetService("Lighting")
-local Players = MacLib.GetService("Players")
+
+local Service = {
+	TweenService = GetService("TweenService"),
+	RunService = GetService("RunService"),
+	HttpService = GetService("HttpService"),
+	ContentProvider = GetService("ContentProvider"),
+	UserInputService = GetService("UserInputService"),
+	Lighting = GetService("Lighting"),
+	Players = GetService("Players")
+}
+local TweenService = Service.TweenService
+local RunService =	Service.RunService
+local HttpService = Service.HttpService
+local ContentProvider = Service.ContentProvider
+local UserInputService = Service.UserInputService
+local Lighting =	Service.Lighting
+local Players = 	Service.Players
+
 
 
 local isStudio = RunService:IsStudio()
+
 local LocalPlayer = Players.LocalPlayer
 
 local windowState
@@ -45,40 +56,27 @@ local assets = {
 	sliderhead = "rbxassetid://18772834246",
 }
 
---// ==================================================================
---//  HELPER FUNCTIONS
---// ==================================================================
+if isStudio then
+	return 
+end
 
 local function GetGui()
-	local parent
+	local parent = MacLib.GetService("CoreGui")
 
-	if isStudio then
-		parent = LocalPlayer:FindFirstChild("PlayerGui")
-	elseif gethui then
-		local ok, result = pcall(gethui)
-		if ok then parent = result end
-	end
-	parent = parent or MacLib.GetService("CoreGui")
-
-	-- ลบ UI เก่า
 	for _, gui in ipairs(parent:GetChildren()) do
-		if gui:IsA("ScreenGui") and gui.Name == "Senith V1.0 " then
+		if gui.Name == "Senith V1.0" then 
+			print("uh")
 			gui:Destroy()
-		end
+		 end
 	end
 
 	local newGui = Instance.new("ScreenGui")
-	newGui.Name = "Senith V1.0 "
+	newGui.Name = "Senith V1.0"
 	newGui.ScreenInsets = Enum.ScreenInsets.None
 	newGui.ResetOnSpawn = false
 	newGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 	newGui.DisplayOrder = 2147483647
-
-	-- ถ้า parent เข้าไม่ได้ ให้ถอยไปใช้ PlayerGui
-	local ok = pcall(function() newGui.Parent = parent end)
-	if not ok or not newGui.Parent then
-		newGui.Parent = LocalPlayer:WaitForChild("PlayerGui")
-	end
+	newGui.Parent = parent
 	return newGui
 end
 
@@ -86,10 +84,6 @@ local function Tween(instance, tweeninfo, propertytable)
 	return TweenService:Create(instance, tweeninfo, propertytable)
 end
 
-
---// ==================================================================
---//  WINDOW
---// ==================================================================
 
 function MacLib:Window(Settings)
 	local WindowFunctions = {Settings = Settings}
@@ -100,10 +94,6 @@ function MacLib:Window(Settings)
 	end
 
 	local macLib = GetGui()
-
-	--// ------------------------------------------------------------------
-	--//  Notification container
-	--// ------------------------------------------------------------------
 
 	local notifications = Instance.new("Frame")
 	notifications.Name = "Notifications"
@@ -131,10 +121,6 @@ function MacLib:Window(Settings)
 	notificationsUIPadding.PaddingTop = UDim.new(0, 10)
 	notificationsUIPadding.Parent = notifications
 
-	--// ------------------------------------------------------------------
-	--//  Base frame (main window)
-	--// ------------------------------------------------------------------
-
 	local base = Instance.new("Frame")
 	base.Name = "Base"
 	base.AnchorPoint = Vector2.new(0.5, 0.5)
@@ -160,10 +146,6 @@ function MacLib:Window(Settings)
 	baseUIStroke.Color = Color3.fromRGB(255, 255, 255)
 	baseUIStroke.Transparency = 0.9
 	baseUIStroke.Parent = base
-
-	--// ------------------------------------------------------------------
-	--//  Sidebar
-	--// ------------------------------------------------------------------
 
 	local sidebar = Instance.new("Frame")
 	sidebar.Name = "Sidebar"
@@ -199,10 +181,6 @@ function MacLib:Window(Settings)
 	dividerInteract.TextColor3 = Color3.fromRGB(0, 0, 0)
 	dividerInteract.TextSize = 14
 	dividerInteract.Parent = divider
-
-	--// ------------------------------------------------------------------
-	--//  Window controls (exit / minimize / maximize)
-	--// ------------------------------------------------------------------
 
 	local windowControls = Instance.new("Frame")
 	windowControls.Name = "WindowControls"
@@ -349,10 +327,6 @@ function MacLib:Window(Settings)
 
 	windowControls.Parent = sidebar
 
-	--// ------------------------------------------------------------------
-	--//  Title & subtitle
-	--// ------------------------------------------------------------------
-
 	local information = Instance.new("Frame")
 	information.Name = "Information"
 	information.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
@@ -388,6 +362,38 @@ function MacLib:Window(Settings)
 	informationHolderUIPadding.PaddingRight = UDim.new(0, 22)
 	informationHolderUIPadding.PaddingTop = UDim.new(0, 10)
 	informationHolderUIPadding.Parent = informationHolder
+
+	local globalSettingsButton = Instance.new("ImageButton")
+	globalSettingsButton.Name = "GlobalSettingsButton"
+	globalSettingsButton.Image = assets.globe
+	globalSettingsButton.ImageTransparency = 0.5
+	globalSettingsButton.AnchorPoint = Vector2.new(1, 0.5)
+	globalSettingsButton.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+	globalSettingsButton.BackgroundTransparency = 1
+	globalSettingsButton.BorderColor3 = Color3.fromRGB(0, 0, 0)
+	globalSettingsButton.BorderSizePixel = 0
+	globalSettingsButton.Position = UDim2.fromScale(1, 0.5)
+	globalSettingsButton.Size = UDim2.fromOffset(16,16)
+	globalSettingsButton.Parent = informationHolder
+
+	local function ChangeGlobalSettingsButtonState(State)
+		if State == "Default" then
+			Tween(globalSettingsButton, TweenInfo.new(0.2, Enum.EasingStyle.Sine), {
+				ImageTransparency = 0.5
+			}):Play()
+		elseif State == "Hover" then
+			Tween(globalSettingsButton, TweenInfo.new(0.2, Enum.EasingStyle.Sine), {
+				ImageTransparency = 0.3
+			}):Play()
+		end
+	end
+
+	globalSettingsButton.MouseEnter:Connect(function()
+		ChangeGlobalSettingsButtonState("Hover")
+	end)
+	globalSettingsButton.MouseLeave:Connect(function()
+		ChangeGlobalSettingsButtonState("Default")
+	end)
 
 	local titleFrame = Instance.new("Frame")
 	titleFrame.Name = "TitleFrame"
@@ -458,10 +464,6 @@ function MacLib:Window(Settings)
 
 	information.Parent = sidebar
 
-	--// ------------------------------------------------------------------
-	--//  Sidebar group: user info + tab switchers
-	--// ------------------------------------------------------------------
-
 	local sidebarGroup = Instance.new("Frame")
 	sidebarGroup.Name = "SidebarGroup"
 	sidebarGroup.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
@@ -470,10 +472,6 @@ function MacLib:Window(Settings)
 	sidebarGroup.BorderSizePixel = 0
 	sidebarGroup.Position = UDim2.fromOffset(0, 91)
 	sidebarGroup.Size = UDim2.new(1, 0, 1, -91)
-
-	--// ------------------------------------------------------------------
-	--//  User info
-	--// ------------------------------------------------------------------
 
 	local userInfo = Instance.new("Frame")
 	userInfo.Name = "UserInfo"
@@ -619,10 +617,6 @@ function MacLib:Window(Settings)
 	sidebarGroupUIPadding.PaddingTop = UDim.new(0, 31)
 	sidebarGroupUIPadding.Parent = sidebarGroup
 
-	--// ------------------------------------------------------------------
-	--//  Tab switchers
-	--// ------------------------------------------------------------------
-
 	local tabSwitchers = Instance.new("Frame")
 	tabSwitchers.Name = "TabSwitchers"
 	tabSwitchers.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
@@ -664,10 +658,6 @@ function MacLib:Window(Settings)
 
 	sidebar.Parent = base
 
-	--// ------------------------------------------------------------------
-	--//  Content area + sidebar resizing
-	--// ------------------------------------------------------------------
-
 	local content = Instance.new("Frame")
 	content.Name = "Content"
 	content.AnchorPoint = Vector2.new(1, 0)
@@ -695,7 +685,7 @@ function MacLib:Window(Settings)
 	local function ChangeState(State)
 		Tween(divider, TweenInfo.new(0.2, TweenSettings.EasingStyle), {
 			BackgroundTransparency = State == "Idle" and TweenSettings.DefaultTransparency or TweenSettings.HoverTransparency
-		}):Play()
+		}):Play()  
 	end
 
 	dividerInteract.MouseEnter:Connect(function()
@@ -732,10 +722,6 @@ function MacLib:Window(Settings)
 			content.Size = UDim2.new(0, base.AbsoluteSize.X - newSidebarWidth, 1, 0)
 		end
 	end)
-
-	--// ------------------------------------------------------------------
-	--//  Topbar
-	--// ------------------------------------------------------------------
 
 	local topbar = Instance.new("Frame")
 	topbar.Name = "Topbar"
@@ -817,10 +803,6 @@ function MacLib:Window(Settings)
 	interact.MouseLeave:Connect(function()
 		ChangemoveIconState("Default")
 	end)
-
-	--// ------------------------------------------------------------------
-	--//  Window dragging
-	--// ------------------------------------------------------------------
 
 	local dragging_ = false
 	local dragInput
@@ -922,10 +904,6 @@ function MacLib:Window(Settings)
 
 	content.Parent = base
 
-	--// ------------------------------------------------------------------
-	--//  Global settings panel
-	--// ------------------------------------------------------------------
-
 	local globalSettings = Instance.new("Frame")
 	globalSettings.Name = "GlobalSettings"
 	globalSettings.AutomaticSize = Enum.AutomaticSize.XY
@@ -965,10 +943,6 @@ function MacLib:Window(Settings)
 	globalSettings.Parent = base
 	base.Parent = macLib
 
-	--// ------------------------------------------------------------------
-	--//  Window API: title / subtitle
-	--// ------------------------------------------------------------------
-
 	function WindowFunctions:UpdateTitle(NewTitle)
 		title.Text = NewTitle
 	end
@@ -976,10 +950,6 @@ function MacLib:Window(Settings)
 	function WindowFunctions:UpdateSubtitle(NewSubtitle)
 		subtitle.Text = NewSubtitle
 	end
-
-	--// ------------------------------------------------------------------
-	--//  Global settings toggle
-	--// ------------------------------------------------------------------
 
 	local hovering
 	local toggled = globalSettingsUIScale.Scale == 1 and true or false
@@ -1000,7 +970,10 @@ function MacLib:Window(Settings)
 			toggled = false
 		end
 	end
-
+	globalSettingsButton.MouseButton1Click:Connect(function()
+		if not hasGlobalSetting then return end
+		toggle()
+	end)
 	globalSettings.MouseEnter:Connect(function()
 		hovering = true
 	end)
@@ -1012,10 +985,6 @@ function MacLib:Window(Settings)
 			toggle()
 		end
 	end)
-
-	--// ------------------------------------------------------------------
-	--//  Acrylic blur
-	--// ------------------------------------------------------------------
 
 	local BlurTarget = base
 
@@ -1220,10 +1189,10 @@ function MacLib:Window(Settings)
 			end
 		end
 		DrawQuad(
-			camera:ScreenPointToRay(tl.x, tl.y, zIndex).Origin,
-			camera:ScreenPointToRay(tr.x, tr.y, zIndex).Origin,
-			camera:ScreenPointToRay(bl.x, bl.y, zIndex).Origin,
-			camera:ScreenPointToRay(br.x, br.y, zIndex).Origin,
+			camera:ScreenPointToRay(tl.x, tl.y, zIndex).Origin, 
+			camera:ScreenPointToRay(tr.x, tr.y, zIndex).Origin, 
+			camera:ScreenPointToRay(bl.x, bl.y, zIndex).Origin, 
+			camera:ScreenPointToRay(br.x, br.y, zIndex).Origin, 
 			parts
 		)
 		if fetchProps then
@@ -1241,10 +1210,6 @@ function MacLib:Window(Settings)
 	UpdateOrientation(true)
 
 	RunService.RenderStepped:Connect(UpdateOrientation)
-
-	--// ------------------------------------------------------------------
-	--//  Window API: GlobalSetting
-	--// ------------------------------------------------------------------
 
 	function WindowFunctions:GlobalSetting(Settings)
 		hasGlobalSetting = true
@@ -1392,10 +1357,6 @@ function MacLib:Window(Settings)
 		return GlobalSettingFunctions
 	end
 
-	--// ------------------------------------------------------------------
-	--//  Window API: TabGroup
-	--// ------------------------------------------------------------------
-
 	function WindowFunctions:TabGroup()
 		local SectionFunctions = {}
 
@@ -1441,10 +1402,6 @@ function MacLib:Window(Settings)
 
 		sectionTabSwitchers.Parent = tabGroup
 		tabGroup.Parent = tabSwitchersScrollingFrame
-
-		--// ------------------------------------------------------------------
-		--//  Tab
-		--// ------------------------------------------------------------------
 
 		function SectionFunctions:Tab(Settings)
 			local TabFunctions = {Settings = Settings}
@@ -1619,10 +1576,6 @@ function MacLib:Window(Settings)
 
 			elementsScrolling.Parent = elements1
 
-			--// ------------------------------------------------------------------
-			--//  Section (container for elements)
-			--// ------------------------------------------------------------------
-
 			function TabFunctions:Section(Settings)
 				local SectionFunctions = {}
 				local section = Instance.new("Frame")
@@ -1661,10 +1614,6 @@ function MacLib:Window(Settings)
 				sectionUIPadding.PaddingRight = UDim.new(0, 18)
 				sectionUIPadding.PaddingTop = UDim.new(0, 22)
 				sectionUIPadding.Parent = section
-
-				--// ------------------------------------------------------------------
-				--//  Element: Button
-				--// ------------------------------------------------------------------
 
 				function SectionFunctions:Button(Settings, Flag)
 					local ButtonFunctions = {Settings = Settings}
@@ -1759,10 +1708,6 @@ function MacLib:Window(Settings)
 					end
 					return ButtonFunctions
 				end
-
-				--// ------------------------------------------------------------------
-				--//  Element: Toggle
-				--// ------------------------------------------------------------------
 
 				function SectionFunctions:Toggle(Settings, Flag)
 					local ToggleFunctions = { Settings = Settings, IgnoreConfig = false, Class = "Toggle" }
@@ -1902,10 +1847,6 @@ function MacLib:Window(Settings)
 					end
 					return ToggleFunctions
 				end
-
-				--// ------------------------------------------------------------------
-				--//  Element: Slider
-				--// ------------------------------------------------------------------
 
 				function SectionFunctions:Slider(Settings, Flag)
 					local SliderFunctions = { Settings = Settings, IgnoreConfig = false, Class = "Slider" }
@@ -2168,10 +2109,6 @@ function MacLib:Window(Settings)
 					return SliderFunctions
 				end
 
-				--// ------------------------------------------------------------------
-				--//  Element: Input
-				--// ------------------------------------------------------------------
-
 				function SectionFunctions:Input(Settings, Flag)
 					local InputFunctions = { Settings = Settings, IgnoreConfig = false, Class = "Input" }
 					local input = Instance.new("Frame")
@@ -2347,10 +2284,6 @@ function MacLib:Window(Settings)
 					end
 					return InputFunctions
 				end
-
-				--// ------------------------------------------------------------------
-				--//  Element: Keybind
-				--// ------------------------------------------------------------------
 
 				function SectionFunctions:Keybind(Settings, Flag)
 					local KeybindFunctions = { Settings = Settings, IgnoreConfig = false, Class = "Keybind" }
@@ -2531,10 +2464,6 @@ function MacLib:Window(Settings)
 
 					return KeybindFunctions
 				end
-
-				--// ------------------------------------------------------------------
-				--//  Element: Dropdown
-				--// ------------------------------------------------------------------
 
 				function SectionFunctions:Dropdown(Settings, Flag)
 					local DropdownFunctions = { Settings = Settings, IgnoreConfig = false, Class = "Dropdown" }
@@ -3107,10 +3036,6 @@ function MacLib:Window(Settings)
 
 					return DropdownFunctions
 				end
-
-				--// ------------------------------------------------------------------
-				--//  Element: Colorpicker
-				--// ------------------------------------------------------------------
 
 				function SectionFunctions:Colorpicker(Settings, Flag)
 					local ColorpickerFunctions = { Settings = Settings, IgnoreConfig = false, Class = "Colorpicker" }
@@ -4110,7 +4035,7 @@ function MacLib:Window(Settings)
 						modifierInputs.Blue.Text = tostring(math.floor(c.b * 255 + 0.5))
 						modifierInputs.Alpha.Text = clampInput(modifierInputs.Alpha.Text, 0, 1)
 
-						local hexColor = string.format("#%02X%02X%02X",
+						local hexColor = string.format("#%02X%02X%02X", 
 							math.floor(c.r * 255 + 0.5),
 							math.floor(c.g * 255 + 0.5),
 							math.floor(c.b * 255 + 0.5))
@@ -4396,10 +4321,6 @@ function MacLib:Window(Settings)
 					return ColorpickerFunctions
 				end
 
-				--// ------------------------------------------------------------------
-				--//  Element: Header
-				--// ------------------------------------------------------------------
-
 				function SectionFunctions:Header(Settings, Flag)
 					local HeaderFunctions = {Settings = Settings}
 
@@ -4454,10 +4375,6 @@ function MacLib:Window(Settings)
 					return HeaderFunctions
 				end
 
-				--// ------------------------------------------------------------------
-				--//  Element: Label
-				--// ------------------------------------------------------------------
-
 				function SectionFunctions:Label(Settings, Flag)
 					local LabelFunctions = {Settings = Settings}
 
@@ -4502,10 +4419,6 @@ function MacLib:Window(Settings)
 					return LabelFunctions
 				end
 
-				--// ------------------------------------------------------------------
-				--//  Element: SubLabel
-				--// ------------------------------------------------------------------
-
 				function SectionFunctions:SubLabel(Settings, Flag)
 					local SubLabelFunctions = {Settings = Settings}
 
@@ -4549,10 +4462,6 @@ function MacLib:Window(Settings)
 					end
 					return SubLabelFunctions
 				end
-
-				--// ------------------------------------------------------------------
-				--//  Element: Paragraph
-				--// ------------------------------------------------------------------
 
 				function SectionFunctions:Paragraph(Settings, Flag)
 					local ParagraphFunctions = {Settings = Settings}
@@ -4630,10 +4539,6 @@ function MacLib:Window(Settings)
 					return ParagraphFunctions
 				end
 
-				--// ------------------------------------------------------------------
-				--//  Element: Divider
-				--// ------------------------------------------------------------------
-
 				function SectionFunctions:Divider()
 					local DividerFunctions = {}
 
@@ -4679,10 +4584,6 @@ function MacLib:Window(Settings)
 					return DividerFunctions
 				end
 
-				--// ------------------------------------------------------------------
-				--//  Element: Spacer
-				--// ------------------------------------------------------------------
-
 				function SectionFunctions:Spacer()
 					local SpacerFunctions = {}
 
@@ -4708,10 +4609,6 @@ function MacLib:Window(Settings)
 
 				return SectionFunctions
 			end
-
-			--// ------------------------------------------------------------------
-			--//  Tab selection
-			--// ------------------------------------------------------------------
 
 			local function SelectCurrentTab()
 				local easetime = 0.15
@@ -4755,17 +4652,9 @@ function MacLib:Window(Settings)
 				SelectCurrentTab()
 			end
 
-			--// ------------------------------------------------------------------
-			--//  Tab: built-in config section
-			--// ------------------------------------------------------------------
-
 			function TabFunctions:InsertConfigSection(Side)
 				local configSection = TabFunctions:Section({ Side = "Left" })
 
-				if isStudio then
-					configSection:Label({Text = "Config system unavailable. (Environment isStudio)"})
-					return "Config system unavailable."
-				end
 
 				local inputPath = nil
 				local selectedConfig = nil
@@ -4899,10 +4788,6 @@ function MacLib:Window(Settings)
 
 		return SectionFunctions
 	end
-
-	--// ------------------------------------------------------------------
-	--//  Window API: Notify
-	--// ------------------------------------------------------------------
 
 	function WindowFunctions:Notify(Settings)
 		local NotificationFunctions = {}
@@ -5115,10 +5000,6 @@ function MacLib:Window(Settings)
 
 		return NotificationFunctions
 	end
-
-	--// ------------------------------------------------------------------
-	--//  Window API: Dialog
-	--// ------------------------------------------------------------------
 
 	function WindowFunctions:Dialog(Settings)
 		local DialogFunctions = {}
@@ -5378,10 +5259,6 @@ function MacLib:Window(Settings)
 		return DialogFunctions
 	end
 
-	--// ------------------------------------------------------------------
-	--//  Window API: state / keybind / user info / scale
-	--// ------------------------------------------------------------------
-
 	function WindowFunctions:SetNotificationsState(State)
 		notifications.Visible = State
 	end
@@ -5403,7 +5280,7 @@ function MacLib:Window(Settings)
 
 	function WindowFunctions:Unload()
 		if onUnloadCallback then
-			onUnloadCallback()
+			onUnloadCallback()  
 		end
 		macLib:Destroy()
 		unloaded = true
@@ -5508,16 +5385,12 @@ function MacLib:Window(Settings)
 		return baseUIScale.Scale
 	end
 
-	--// ------------------------------------------------------------------
-	--//  Config system (save / load)
-	--// ------------------------------------------------------------------
-
 	local ClassParser = {
 		["Toggle"] = {
 			Save = function(Flag, data)
 				return {
-					type = "Toggle",
-					flag = Flag,
+					type = "Toggle", 
+					flag = Flag, 
 					state = data.State or false
 				}
 			end,
@@ -5530,8 +5403,8 @@ function MacLib:Window(Settings)
 		["Slider"] = {
 			Save = function(Flag, data)
 				return {
-					type = "Slider",
-					flag = Flag,
+					type = "Slider", 
+					flag = Flag, 
 					value = (data.Value and tostring(data.Value)) or false
 				}
 			end,
@@ -5544,8 +5417,8 @@ function MacLib:Window(Settings)
 		["Input"] = {
 			Save = function(Flag, data)
 				return {
-					type = "Input",
-					flag = Flag,
+					type = "Input", 
+					flag = Flag, 
 					text = data.Text
 				}
 			end,
@@ -5558,8 +5431,8 @@ function MacLib:Window(Settings)
 		["Keybind"] = {
 			Save = function(Flag, data)
 				return {
-					type = "Keybind",
-					flag = Flag,
+					type = "Keybind", 
+					flag = Flag, 
 					bind = (typeof(data.Bind) == "EnumItem" and data.Bind.Name) or nil
 				}
 			end,
@@ -5572,8 +5445,8 @@ function MacLib:Window(Settings)
 		["Dropdown"] = {
 			Save = function(Flag, data)
 				return {
-					type = "Dropdown",
-					flag = Flag,
+					type = "Dropdown", 
+					flag = Flag, 
 					value = data.Value
 				}
 			end,
@@ -5590,8 +5463,8 @@ function MacLib:Window(Settings)
 				end
 
 				return {
-					type = "Colorpicker",
-					flag = Flag,
+					type = "Colorpicker", 
+					flag = Flag, 
 					color = Color3ToHex(data.Color) or nil,
 					alpha = data.Alpha
 				}
@@ -5605,7 +5478,7 @@ function MacLib:Window(Settings)
 				end
 
 				if MacLib.Options[Flag] and data.color then
-					MacLib.Options[Flag]:SetColor(HexToColor3(data.color))
+					MacLib.Options[Flag]:SetColor(HexToColor3(data.color)) 
 					if data.alpha then
 						MacLib.Options[Flag]:SetAlpha(data.alpha)
 					end
@@ -5676,7 +5549,7 @@ function MacLib:Window(Settings)
 			if option.IgnoreConfig then continue end
 
 			table.insert(data.objects, ClassParser[option.Class].Save(flag, option))
-		end
+		end	
 
 		local success, encoded = pcall(HttpService.JSONEncode, HttpService, data)
 		if not success then
@@ -5688,7 +5561,7 @@ function MacLib:Window(Settings)
 	end
 
 	function MacLib:LoadConfig(Path)
-		if isStudio or not (isfile and readfile) then return "Config system unavailable." end
+
 
 		if (not Path) then
 			return false, "Please select a config file."
@@ -5702,8 +5575,8 @@ function MacLib:Window(Settings)
 
 		for _, option in next, decoded.objects do
 			if ClassParser[option.type] then
-				task.spawn(function()
-					ClassParser[option.type].Load(option.flag, option)
+				task.spawn(function() 
+					ClassParser[option.type].Load(option.flag, option) 
 				end)
 			end
 		end
@@ -5712,8 +5585,6 @@ function MacLib:Window(Settings)
 	end
 
 	function MacLib:RefreshConfigList()
-		if isStudio or not (isfolder and listfiles) then return "Config system unavailable." end
-
 		local list = (isfolder(MacLib.Folder) and isfolder(MacLib.Folder .. "/settings")) and listfiles(MacLib.Folder .. "/settings") or {}
 
 		local out = {}
@@ -5741,10 +5612,6 @@ function MacLib:Window(Settings)
 		return out
 	end
 
-	--// ------------------------------------------------------------------
-	--//  Finalize: preload assets & show window
-	--// ------------------------------------------------------------------
-
 	macLib.Enabled = false
 
 	local assetList = {}
@@ -5758,10 +5625,6 @@ function MacLib:Window(Settings)
 
 	return WindowFunctions
 end
-
---// ==================================================================
---//  DEMO
---// ==================================================================
 
 function MacLib:Demo()
 	local Window = MacLib:Window({
