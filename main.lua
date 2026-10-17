@@ -50,18 +50,20 @@ local assets = {
 --// ==================================================================
 
 local function GetGui()
-	-- ตรวจสอบและลบ ScreenGui ตัวเก่าที่ชื่อ "Senith V1.0 " ออกก่อน (รองรับทั้ง PlayerGui และ CoreGui/gethui)
-	local parent = RunService:IsStudio()
-		and LocalPlayer:FindFirstChild("PlayerGui")
-		or (gethui and gethui())
-		or (cloneref and cloneref(MacLib.GetService("CoreGui")) or MacLib.Core.GetService("CoreGui"))
+	local parent
 
-	if parent then
-		for _, gui in ipairs(parent:GetChildren()) do
-			if gui:IsA("ScreenGui") and gui.Name == "Senith V1.0 " then
-				gui:Destroy()
-				print("[MacLib] พบ UI เก่า 'Senith V1.0 ' ทำการลบออกเรียบร้อยแล้ว และกำลังสร้างใหม่...")
-			end
+	if isStudio then
+		parent = LocalPlayer:FindFirstChild("PlayerGui")
+	elseif gethui then
+		local ok, result = pcall(gethui)
+		if ok then parent = result end
+	end
+	parent = parent or MacLib.GetService("CoreGui")
+
+	-- ลบ UI เก่า
+	for _, gui in ipairs(parent:GetChildren()) do
+		if gui:IsA("ScreenGui") and gui.Name == "Senith V1.0 " then
+			gui:Destroy()
 		end
 	end
 
@@ -72,10 +74,13 @@ local function GetGui()
 	newGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 	newGui.DisplayOrder = 2147483647
 
-	newGui.Parent = parent
+	-- ถ้า parent เข้าไม่ได้ ให้ถอยไปใช้ PlayerGui
+	local ok = pcall(function() newGui.Parent = parent end)
+	if not ok or not newGui.Parent then
+		newGui.Parent = LocalPlayer:WaitForChild("PlayerGui")
+	end
 	return newGui
 end
-
 
 local function Tween(instance, tweeninfo, propertytable)
 	return TweenService:Create(instance, tweeninfo, propertytable)
