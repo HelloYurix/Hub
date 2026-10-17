@@ -11,8 +11,10 @@ local Service = {
 	ContentProvider = GetService("ContentProvider"),
 	UserInputService = GetService("UserInputService"),
 	Lighting = GetService("Lighting"),
-	Players = GetService("Players")
+	Players = GetService("Players"),
+	CoreGui = GetService("CoreGui")
 }
+lcoal CoreGui = Service.CoreGui
 local TweenService = Service.TweenService
 local RunService =	Service.RunService
 local HttpService = Service.HttpService
@@ -58,7 +60,7 @@ if isStudio then
 end
 
 local function GetGui()
-	local parent = MacLib.GetService("CoreGui")
+		local parent = CoreGui("CoreGui")
 
 	for _, gui in ipairs(parent:GetChildren()) do
 		if gui.Name == "Senith V1.0" then 
